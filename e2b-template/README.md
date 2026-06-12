@@ -60,7 +60,7 @@ CODEX_MAX_ITERATIONS=100                  # max tool-loop iterations per task
 
 ```bash
 # Backend
-python -m uvicorn src.paperbot.api.main:app --reload --port 8000
+python -m uvicorn paperbot.api.main:app --reload --port 8000
 
 # Frontend
 cd web && npm run dev

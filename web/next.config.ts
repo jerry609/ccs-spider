@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: "..",
+  },
   reactCompiler: true,
   httpAgentOptions: {
     keepAlive: true,

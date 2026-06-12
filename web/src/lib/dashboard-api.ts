@@ -3,6 +3,7 @@ import type {
   AnchorPreviewItem,
   IntelligenceFeedResponse,
   ReadingQueueItem,
+  ResearchTrackContextResponse,
   ResearchTrackSummary,
   TrackFeedItem,
 } from "./types"
@@ -59,6 +60,16 @@ export async function fetchDashboardTrackFeed(
     items: payload?.items || [],
     total: Number(payload?.total || 0),
   }
+}
+
+export async function fetchDashboardTrackContext(
+  trackId: number,
+  accessToken?: string,
+): Promise<ResearchTrackContextResponse | null> {
+  return fetchJsonOrNull<ResearchTrackContextResponse>(
+    `/research/tracks/${encodeURIComponent(String(trackId))}/context`,
+    accessToken,
+  )
 }
 
 export async function fetchDashboardAnchors(

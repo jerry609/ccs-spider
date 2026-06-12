@@ -5,17 +5,14 @@ import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { AuthSplitLayout } from "@/components/auth/AuthSplitLayout"
-import { buildAuthGateContext, buildLoginHref } from "@/lib/auth-flow"
+import { buildLoginHref } from "@/lib/auth-flow"
 
-type Strength = { score: 0 | 1 | 2 | 3 | 4; label: string; color: string }
+type Strength = { score: 0 | 1 | 2 | 3 | 4; label: string; width: string }
+
+const INTEREST_OPTIONS = ["LLM", "Multimodal", "CV", "RL", "Systems", "Theory"] as const
 
 function getStrength(pw: string): Strength {
-  if (!pw) return { score: 0, label: "", color: "" }
+  if (!pw) return { score: 0, label: "", width: "0%" }
   let score = 0
   if (pw.length >= 8) score++
   if (pw.length >= 12) score++
@@ -23,11 +20,11 @@ function getStrength(pw: string): Strength {
   if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++
 
   const levels: Strength[] = [
-    { score: 0, label: "", color: "" },
-    { score: 1, label: "Weak", color: "bg-red-500" },
-    { score: 2, label: "Fair", color: "bg-orange-400" },
-    { score: 3, label: "Good", color: "bg-yellow-400" },
-    { score: 4, label: "Strong", color: "bg-green-500" },
+    { score: 0, label: "", width: "0%" },
+    { score: 1, label: "弱", width: "25%" },
+    { score: 2, label: "中等", width: "50%" },
+    { score: 3, label: "良好", width: "75%" },
+    { score: 4, label: "强", width: "100%" },
   ]
   return levels[score as 0 | 1 | 2 | 3 | 4]
 }
@@ -47,34 +44,35 @@ function RegisterPageWithSearchParams() {
 }
 
 function RegisterPageContent({ callbackUrl }: { callbackUrl: string }) {
-  const [displayName, setDisplayName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
+  const [accepted, setAccepted] = useState(true)
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(["LLM", "Multimodal"])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [githubLoading, setGithubLoading] = useState(false)
   const router = useRouter()
-  const gate = useMemo(() => buildAuthGateContext(callbackUrl), [callbackUrl])
   const strength = useMemo(() => getStrength(password), [password])
-  const mismatch = confirm.length > 0 && confirm !== password
   const loginHref = buildLoginHref(callbackUrl)
-  const studioReturn = gate.destination.startsWith("/studio")
-  const cardTitle = studioReturn ? "Create your account to continue to Studio" : "Create your PaperBot account"
-  const cardDescription = studioReturn
-    ? "Finish account setup once, then return directly to the DeepCode Studio launch flow."
-    : "Create your account and continue directly to the destination you originally requested."
+
+  const toggleInterest = (value: string) => {
+    setSelectedInterests((current) =>
+      current.includes(value) ? current.filter((item) => item !== value) : [...current, value],
+    )
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password !== confirm) {
-      setError("Passwords do not match.")
+    if (!accepted) {
+      setError("请先同意服务条款与隐私政策。")
       return
     }
     setError(null)
     setLoading(true)
+
+    const displayName = [lastName, firstName].map((value) => value.trim()).filter(Boolean).join(" ")
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -99,203 +97,178 @@ function RegisterPageContent({ callbackUrl }: { callbackUrl: string }) {
     }
   }
 
-  const onGithub = () => {
-    setGithubLoading(true)
-    signIn("github", { callbackUrl })
-  }
-
   return (
-    <AuthSplitLayout
-      panelEyebrow={gate.eyebrow}
-      panelTitle={gate.title}
-      panelDescription={gate.description}
-      panelSteps={gate.steps}
-      destinationLabel={gate.destinationLabel}
-      destination={gate.destination}
-      cardEyebrow="Create account"
-      cardTitle={cardTitle}
-      cardDescription={cardDescription}
-    >
-      <Button
-        variant="outline"
-        className="h-11 w-full rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-        onClick={onGithub}
-        disabled={loading || githubLoading}
-      >
-        {githubLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <GitHubIcon />
-        )}
-        Continue with GitHub
-      </Button>
+    <div className="min-h-screen bg-[#faf9f4]">
+      <div className="grid min-h-screen lg:grid-cols-2">
+        <section className="relative hidden overflow-hidden bg-[linear-gradient(180deg,#134e4a_0%,#0f172a_100%)] px-12 py-12 text-white lg:flex lg:flex-col lg:justify-between">
+          <div className="absolute bottom-[-200px] left-[-140px] h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(245,158,11,.25),transparent_65%)]" />
 
-      <div className="flex items-center gap-3 text-slate-400">
-        <Separator className="flex-1 bg-slate-200" />
-        <span className="text-[11px] uppercase tracking-[0.16em]">or</span>
-        <Separator className="flex-1 bg-slate-200" />
-      </div>
+          <div className="relative text-[18px] font-bold text-[#5eead4]">PaperBot</div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="displayName">
-            Display name{" "}
-            <span className="font-normal text-slate-400">(optional)</span>
-          </Label>
-          <Input
-            id="displayName"
-            type="text"
-            autoComplete="name"
-            placeholder="Alex Johnson"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            disabled={loading}
-            className="h-11 rounded-2xl border-slate-200 bg-white"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email address</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="name@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-            required
-            className="h-11 rounded-2xl border-slate-200 bg-white"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
           <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
-              placeholder="Min. 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              required
-              minLength={8}
-              className="h-11 rounded-2xl border-slate-200 bg-white pr-10"
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              onClick={() => setShowPassword((value) => !value)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-700"
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
+            <h2 className="text-[34px] font-semibold leading-[1.3]">
+              加入 PaperBot，
+              <br />
+              重建你的研究节奏。
+            </h2>
+            <p className="mt-[18px] text-[13px] text-[#94a3b8]">
+              注册即享 14 天完整功能，无需信用卡。
+            </p>
           </div>
 
-          {password.length > 0 ? (
-            <div className="space-y-1">
-              <div className="flex gap-1">
-                {([1, 2, 3, 4] as const).map((level) => (
-                  <div
-                    key={level}
-                    className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                      strength.score >= level ? strength.color : "bg-slate-200"
-                    }`}
+          <div className="relative text-[12px] text-[#94a3b8]">
+            已有账号？{" "}
+            <Link href={loginHref} className="text-[#5eead4] hover:underline">
+              登录
+            </Link>
+          </div>
+        </section>
+
+        <section className="flex items-center justify-center px-6 py-10 sm:px-10">
+          <div className="w-full max-w-[400px]">
+            <h1 className="text-[24px] font-semibold text-[#111827]">创建账户</h1>
+            <p className="mb-6 mt-1 text-[14px] text-[#6b7280]">
+              告诉我们你的研究方向，PaperBot 会据此初始化订阅
+            </p>
+
+            <form onSubmit={onSubmit}>
+              <div className="mb-3 grid grid-cols-2 gap-[10px]">
+                <div>
+                  <label htmlFor="lastName" className="mb-1 block text-[12px] font-medium text-[#374151]">
+                    姓
+                  </label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="张"
+                    disabled={loading}
+                    className="h-[42px] w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 text-[14px] text-[#111827] outline-none transition-colors placeholder:text-[#9ca3af] focus:border-[#cbd5e1]"
                   />
-                ))}
+                </div>
+                <div>
+                  <label htmlFor="firstName" className="mb-1 block text-[12px] font-medium text-[#374151]">
+                    名
+                  </label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="研究"
+                    disabled={loading}
+                    className="h-[42px] w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 text-[14px] text-[#111827] outline-none transition-colors placeholder:text-[#9ca3af] focus:border-[#cbd5e1]"
+                  />
+                </div>
               </div>
-              {strength.label ? (
-                <p className="text-xs text-slate-500">
-                  Strength:{" "}
-                  <span
-                    className={`font-medium ${
-                      strength.score <= 1
-                        ? "text-red-500"
-                        : strength.score === 2
-                          ? "text-orange-400"
-                          : strength.score === 3
-                            ? "text-yellow-500"
-                            : "text-green-500"
-                    }`}
+
+              <div className="mb-3">
+                <label htmlFor="email" className="mb-1 block text-[12px] font-medium text-[#374151]">
+                  邮箱
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@lab.edu"
+                  disabled={loading}
+                  required
+                  className="h-[42px] w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 text-[14px] text-[#111827] outline-none transition-colors placeholder:text-[#9ca3af] focus:border-[#cbd5e1]"
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="password" className="mb-1 block text-[12px] font-medium text-[#374151]">
+                  密码
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="至少 8 位"
+                    disabled={loading}
+                    required
+                    minLength={8}
+                    className="h-[42px] w-full rounded-[10px] border border-[#e5e7eb] bg-white px-3 pr-10 text-[14px] text-[#111827] outline-none transition-colors placeholder:text-[#9ca3af] focus:border-[#cbd5e1]"
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => setShowPassword((value) => !value)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#6b7280]"
                   >
-                    {strength.label}
-                  </span>
-                  {strength.score < 3 ? (
-                    <span className="ml-1 text-slate-400">
-                      try adding uppercase, numbers, or symbols
-                    </span>
-                  ) : null}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <div className="mt-1.5 h-1 overflow-hidden rounded-[2px] bg-[#e5e7eb]">
+                  <div
+                    className="h-full bg-[linear-gradient(90deg,#f59e0b,#10b981)] transition-all duration-300"
+                    style={{ width: strength.width }}
+                  />
+                </div>
+                {strength.label ? (
+                  <p className="mt-1 text-[11px] text-[#6b7280]">强度：{strength.label}</p>
+                ) : null}
+              </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="confirm">Confirm password</Label>
-          <div className="relative">
-            <Input
-              id="confirm"
-              type={showConfirm ? "text" : "password"}
-              autoComplete="new-password"
-              placeholder="Re-enter your password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              disabled={loading}
-              required
-              className={`h-11 rounded-2xl bg-white pr-10 ${
-                mismatch ? "border-destructive focus-visible:ring-destructive/30" : "border-slate-200"
-              }`}
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              onClick={() => setShowConfirm((value) => !value)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-700"
-            >
-              {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </button>
+              <div className="mb-4">
+                <label className="mb-1 block text-[12px] font-medium text-[#374151]">研究方向</label>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {INTEREST_OPTIONS.map((interest) => {
+                    const active = selectedInterests.includes(interest)
+                    return (
+                      <button
+                        key={interest}
+                        type="button"
+                        onClick={() => toggleInterest(interest)}
+                        className={[
+                          "rounded-full px-3 py-1 text-[12px] transition-colors",
+                          active
+                            ? "bg-[#ccfbf1] text-[#0f766e]"
+                            : "border border-[#e5e7eb] bg-white text-[#374151]",
+                        ].join(" ")}
+                      >
+                        {interest}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <label className="mb-4 flex items-center gap-2 text-[12.5px] text-[#374151]">
+                <button
+                  type="button"
+                  onClick={() => setAccepted((value) => !value)}
+                  className={[
+                    "flex h-4 w-4 items-center justify-center rounded-[4px] border text-[10px]",
+                    accepted ? "border-[#111827] bg-[#111827] text-white" : "border-[#d1d5db] bg-white text-transparent",
+                  ].join(" ")}
+                >
+                  ✓
+                </button>
+                我同意《服务条款》与《隐私政策》
+              </label>
+
+              {error ? <p className="mb-3 text-[13px] text-[#dc2626]">{error}</p> : null}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-[44px] w-full items-center justify-center rounded-full bg-[#0f172a] px-4 text-[15px] font-medium text-white transition-colors hover:bg-[#1f2937] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                创建账户
+              </button>
+            </form>
           </div>
-          {mismatch ? (
-            <p className="text-xs text-destructive">Passwords do not match.</p>
-          ) : null}
-        </div>
-
-        {error ? (
-          <p className="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-            {error}
-          </p>
-        ) : null}
-
-        <Button
-          type="submit"
-          className="h-11 w-full rounded-full bg-slate-900 text-white hover:bg-slate-800"
-          disabled={loading || githubLoading || mismatch}
-        >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          Create account
-        </Button>
-      </form>
-
-      <p className="text-center text-sm text-slate-500">
-        Already have an account?{" "}
-        <Link
-          href={loginHref}
-          className="font-medium text-slate-900 underline-offset-4 hover:underline"
-        >
-          Sign in
-        </Link>
-      </p>
-    </AuthSplitLayout>
-  )
-}
-
-function GitHubIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
-      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-    </svg>
+        </section>
+      </div>
+    </div>
   )
 }

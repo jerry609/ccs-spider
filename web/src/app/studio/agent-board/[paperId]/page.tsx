@@ -26,7 +26,6 @@ export default function AgentBoardFocusPage() {
       <AgentBoard
         paperId={paperId}
         focusMode
-        monitorMode
         onBack={() => {
           router.push(
             paperId

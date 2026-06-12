@@ -18,6 +18,13 @@ subscriptions:
     - Adversarial Examples
     last_seen_at: '2026-03-08T13:44:26.581Z'
     last_seen_cached_papers: 0
+  - name: Andrej Karpathy
+    semantic_scholar_id: '2105151'
+    keywords: []
+    affiliations: []
+    research_fields: []
+    last_seen_at: '2026-04-18T06:38:15.049Z'
+    last_seen_cached_papers: 0
   settings:
     check_interval: weekly
     papers_per_scholar: 20

@@ -1022,45 +1022,51 @@ function SettingsPageContent() {
     resolvedTab as "account" | "daily-brief" | "models",
   )
 
-  useEffect(() => {
-    setActiveTab(resolvedTab as "account" | "daily-brief" | "models")
-  }, [resolvedTab])
-
   return (
-    <div className="flex-1 max-w-5xl p-8 pt-6">
-      <h2 className="text-2xl font-bold tracking-tight mb-6">Settings</h2>
+    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div className="rounded-[30px] border border-slate-200 bg-white/95 px-6 py-6 shadow-[0_20px_44px_rgba(15,23,42,0.06)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Settings</p>
+          <h2 className="mt-2 text-4xl font-semibold tracking-[-0.03em] text-slate-950">Settings</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Configure providers, delivery routes, account preferences, and the daily brief pipeline.
+          </p>
+        </div>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as "account" | "daily-brief" | "models")}
+        >
+          <TabsList className="mb-6 rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="daily-brief">Daily Brief</TabsTrigger>
+            <TabsTrigger value="models">Model Providers</TabsTrigger>
+          </TabsList>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "account" | "daily-brief" | "models")}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="daily-brief">Daily Brief</TabsTrigger>
-          <TabsTrigger value="models">Model Providers</TabsTrigger>
-        </TabsList>
+          <TabsContent value="account">
+            <AccountSection />
+          </TabsContent>
 
-        <TabsContent value="account">
-          <AccountSection />
-        </TabsContent>
+          <TabsContent value="daily-brief">
+            <DailyBriefSection />
+          </TabsContent>
 
-        <TabsContent value="daily-brief">
-          <DailyBriefSection />
-        </TabsContent>
-
-        <TabsContent value="models">
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Configure LLM providers for paper analysis.</p>
+          <TabsContent value="models">
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Configure LLM providers for paper analysis.</p>
+              </div>
+              <ModelProvidersSection />
             </div>
-            <ModelProvidersSection />
-          </div>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div className="flex-1 max-w-5xl p-8 pt-6" />}>
+    <Suspense fallback={<div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8" />}>
       <SettingsPageContent />
     </Suspense>
   )

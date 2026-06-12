@@ -1,8 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
-import { useSession } from "next-auth/react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
 import { ArrowLeft, Compass } from "lucide-react"
@@ -12,11 +11,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import DiscoveryGraphWorkspace from "./DiscoveryGraphWorkspace"
-import type { Track } from "./TrackSelector"
 
 type SeedType = "doi" | "arxiv" | "openalex" | "semantic_scholar" | "author"
+type Track = {
+  id: number
+  name: string
+  is_active?: boolean
+}
+
 export default function ResearchDiscoveryPage() {
-  const { data: session } = useSession()
   const searchParams = useSearchParams()
   const [tracks, setTracks] = useState<Track[]>([])
   const [activeTrackId, setActiveTrackId] = useState<number | null>(null)
@@ -45,29 +48,16 @@ export default function ResearchDiscoveryPage() {
     [tracks, activeTrackId]
   )
 
-  useEffect(() => {
-    refreshTracks().catch((err) => setError(getErrorMessage(err)))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    if (!routeTrackId || !Number.isFinite(routeTrackId)) return
-    if (!tracks.some((track) => track.id === routeTrackId)) return
-    if (activeTrackId === routeTrackId) return
-    activateTrack(routeTrackId).catch(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeTrackId, tracks, activeTrackId])
-
-  async function refreshTracks() {
+  const refreshTracks = useCallback(async () => {
     const data = await fetchJson<{ tracks: Track[] }>(
       `/api/research/tracks`
     )
     setTracks(data.tracks || [])
     const active = data.tracks.find((track) => track.is_active)
     setActiveTrackId(active?.id ?? null)
-  }
+  }, [])
 
-  async function activateTrack(trackId: number) {
+  const activateTrack = useCallback(async (trackId: number) => {
     setLoading(true)
     setError(null)
     try {
@@ -85,7 +75,18 @@ export default function ResearchDiscoveryPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [refreshTracks])
+
+  useEffect(() => {
+    refreshTracks().catch((err) => setError(getErrorMessage(err)))
+  }, [refreshTracks])
+
+  useEffect(() => {
+    if (!routeTrackId || !Number.isFinite(routeTrackId)) return
+    if (!tracks.some((track) => track.id === routeTrackId)) return
+    if (activeTrackId === routeTrackId) return
+    activateTrack(routeTrackId).catch(() => {})
+  }, [activateTrack, activeTrackId, routeTrackId, tracks])
 
   async function handleDiscoverySave(paper: {
     paper_id: string
