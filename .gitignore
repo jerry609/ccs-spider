@@ -44,6 +44,7 @@ response.html
 # Scholar Tracking
 cache/scholar_papers/*.json
 output/reports/**/*.md
+output/experiments/**
 !cache/scholar_papers/.gitkeep
 !output/reports/.gitkeep
 !logs/.gitkeep
