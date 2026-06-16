@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from paperbot.api.streaming import StreamEvent, sse_response
@@ -25,7 +25,7 @@ from paperbot.application.workflows.harvest_pipeline import (
 )
 from paperbot.api.auth.dependencies import get_required_user_id
 from paperbot.infrastructure.stores.paper_store import PaperStore, paper_to_dict
-from paperbot.utils.logging_config import LogFiles, Logger, clear_trace_id, set_trace_id
+from paperbot.utils.logging_config import LogFiles, Logger, set_trace_id
 
 router = APIRouter()
 
@@ -124,7 +124,7 @@ async def harvest_papers(request: HarvestRequest):
 
     Returns Server-Sent Events with progress updates.
     """
-    trace_id = set_trace_id()
+    set_trace_id()
     Logger.info(f"Starting harvest request: keywords={request.keywords}", file=LogFiles.HARVEST)
     return sse_response(harvest_stream(request), workflow="harvest")
 

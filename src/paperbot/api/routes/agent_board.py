@@ -42,7 +42,6 @@ from ...infrastructure.swarm.shared_sandbox import SharedSandbox
 from ...infrastructure.swarm.verification import (
     VerificationPolicy,
     run_verification,
-    verify_and_repair,
 )
 from ...infrastructure.stores.pipeline_session_store import PipelineSessionStore
 from ..streaming import StreamEvent, sse_response

@@ -20,13 +20,6 @@ from paperbot.application.services.candidate_curation import (
 from paperbot.application.services.candidate_search import resolve_existing_canonical_paper_id
 from paperbot.application.services.daily_push_service import DailyPushService
 from paperbot.application.services.llm_service import get_llm_service
-from paperbot.application.services.enrichment_pipeline import (
-    EnrichmentContext,
-    EnrichmentPipeline,
-    FilterStep,
-    JudgeStep,
-    LLMEnrichmentStep,
-)
 from paperbot.application.services.paper_search_service import PaperSearchService
 from paperbot.application.services.wiki_concept_service import WikiConceptService
 from paperbot.application.services.workflow_query_grounder import WorkflowQueryGrounder

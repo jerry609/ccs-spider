@@ -4007,7 +4007,7 @@ _llm_service: Optional["LLMService"] = None
 
 
 def _get_llm_service() -> "LLMService":
-    from paperbot.application.services.llm_service import LLMService, get_llm_service
+    from paperbot.application.services.llm_service import get_llm_service
 
     global _llm_service
     if _llm_service is None:
