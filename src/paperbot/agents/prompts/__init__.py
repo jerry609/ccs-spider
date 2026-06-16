@@ -3,11 +3,6 @@
 Prompt 模板集中管理。
 """
 
-from .research_prompts import RESEARCH_PROMPTS
-from .code_analysis_prompts import CODE_ANALYSIS_PROMPTS
-from .quality_prompts import QUALITY_PROMPTS
-from .report_prompts import REPORT_PROMPTS
-
 # 学者追踪系统提示词
 from .scholar_prompts import (
     # Schema 定义
@@ -32,11 +27,6 @@ from .scholar_prompts import (
 )
 
 __all__ = [
-    "RESEARCH_PROMPTS",
-    "CODE_ANALYSIS_PROMPTS",
-    "QUALITY_PROMPTS",
-    "REPORT_PROMPTS",
-    
     # Scholar Tracking Schema
     'output_schema_scholar_info',
     'output_schema_paper_analysis',

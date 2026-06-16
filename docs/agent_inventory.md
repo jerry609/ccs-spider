@@ -64,9 +64,6 @@ Use normal services (non-agent) when any of the following dominates:
 - `CodeAnalysisAgent`
 - `ConferenceResearchAgent`
 - `DeepResearchAgent`
-- `DocumentationAgent`
-- `HuggingFaceAgent`
-- `OpenReviewAgent`
 - `PaperTrackerAgent`
 - `QualityAgent`
 - `ResearchAgent`

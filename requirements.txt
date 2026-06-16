@@ -9,11 +9,9 @@ beautifulsoup4>=4.11.0
 
 # 异步处理
 aiohttp>=3.8.0
-aiofiles>=22.1.0
 
 # PDF处理
 pdfplumber>=0.7.0
-PyPDF2>=3.0.0
 
 # 数据处理
 pandas>=1.5.0
@@ -29,12 +27,10 @@ keyring>=25.0.0
 pydantic[email]>=2.0.0
 
 # 日志和调试
-colorlog>=6.7.0
 loguru>=0.7.0
 
 # 代码分析（可选）
 gitpython>=3.1.0
-pygithub>=1.58.0
 
 # 开发工具（可选）
 pytest>=7.2.0

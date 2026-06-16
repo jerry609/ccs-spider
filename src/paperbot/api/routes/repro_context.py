@@ -17,10 +17,9 @@ from dataclasses import asdict as _asdict
 from typing import Literal, Optional
 
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from paperbot.api.streaming import StreamEvent, wrap_generator, sse_response
+from paperbot.api.streaming import StreamEvent, sse_response
 from paperbot.api.auth.dependencies import get_required_user_id
 from paperbot.application.services.p2c.models import (
     GenerateContextRequest as P2CRequest,

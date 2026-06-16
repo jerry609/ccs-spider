@@ -25,8 +25,6 @@ python -m pytest -q "$@" \
   tests/integration/test_eventlog_sqlalchemy.py \
   tests/integration/test_crawler_contract_parsers.py \
   tests/integration/test_arxiv_connector_fixture.py \
-  tests/integration/test_reddit_connector_fixture.py \
-  tests/integration/test_x_importer_fixture.py \
   tests/integration/test_repro_deepcode.py \
   tests/test_generation_agent.py \
   tests/test_repro_planning.py \

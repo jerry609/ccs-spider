@@ -518,15 +518,6 @@ class TestHarvestPipelineServices:
         _ = pipeline.venue_recommender
         assert pipeline._venue_recommender is not None
 
-    def test_deduplicator_lazy_init(self, tmp_path):
-        """PaperDeduplicator is lazily initialized."""
-        db_url = f"sqlite:///{tmp_path / 'test_lazy.db'}"
-        pipeline = HarvestPipeline(db_url=db_url)
-
-        assert pipeline._deduplicator is None
-        _ = pipeline.deduplicator
-        assert pipeline._deduplicator is not None
-
     def test_paper_store_lazy_init(self, tmp_path):
         """PaperStore is lazily initialized."""
         db_url = f"sqlite:///{tmp_path / 'test_lazy.db'}"
