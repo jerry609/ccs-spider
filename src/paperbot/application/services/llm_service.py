@@ -337,24 +337,18 @@ def _format_papers_for_related_work(papers: Sequence[Dict[str, Any]], limit: int
 
 
 def _safe_parse_json(raw: str) -> Optional[Dict[str, Any]]:
+    # 委托给统一的鲁棒解析器（markdown 围栏 / json_repair / 多候选策略），
+    # 同时保留原契约：成功返回 dict，失败或非 dict 返回 None。
+    from paperbot.utils.json_parser import JSONParseError, parse_json
+
     text = (raw or "").strip()
     if not text:
         return None
     try:
-        obj = json.loads(text)
-        return obj if isinstance(obj, dict) else None
-    except Exception:
-        pass
-
-    start = text.find("{")
-    end = text.rfind("}")
-    if start >= 0 and end > start:
-        try:
-            obj = json.loads(text[start : end + 1])
-            return obj if isinstance(obj, dict) else None
-        except Exception:
-            return None
-    return None
+        obj = parse_json(text)
+    except JSONParseError:
+        return None
+    return obj if isinstance(obj, dict) else None
 
 
 def _overlap_relevance_score(*, query: str, paper: Dict[str, Any]) -> int:
