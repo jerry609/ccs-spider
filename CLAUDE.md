@@ -167,9 +167,7 @@ src/paperbot/
 
 Key SSE-streaming endpoints:
 - `GET /api/track` - Scholar tracking
-- `POST /api/analyze` - Paper analysis
 - `POST /api/gen-code` - Paper2Code generation
-- `POST /api/review` - Deep review simulation
 - `POST /api/research/*` - Personalized research context & tracks
 - `GET/POST /api/runbook/*` - DeepCode Studio file management (list/read/write/snapshot/diff/revert)
 - `GET/POST /api/sandbox/*` - Studio execution: queue, run logs, resource metrics
