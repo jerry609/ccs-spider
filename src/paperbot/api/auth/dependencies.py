@@ -59,30 +59,15 @@ def get_current_user(
 
     user = _resolve_user(credentials)
     if user is None:
-        # AUTH_OPTIONAL only affects get_user_id; this dependency always enforces auth.
+        # AUTH_OPTIONAL only affects _resolve_user; this dependency always enforces auth.
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing or invalid token")
     return user
-
-
-def get_user_id(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer),
-) -> Optional[str]:
-    """Return the authenticated user id as a string.
-
-    When AUTH_OPTIONAL=true, missing/invalid tokens return None so callers can
-    distinguish anonymous flows from real user-scoped operations.
-    """
-
-    user = _resolve_user(credentials)
-    if user is None:
-        return None
-    return str(user.id)
 
 
 def get_required_user_id(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer),
 ) -> str:
-    """Like get_user_id but rejects unauthenticated requests even when AUTH_OPTIONAL=true.
+    """Reject unauthenticated requests even when AUTH_OPTIONAL=true.
 
     Use this for any endpoint that writes or reads user-scoped data, so that
     anonymous callers cannot touch the shared "default" namespace.

@@ -136,31 +136,3 @@ class LLMProvider(ABC):
     def __repr__(self) -> str:
         info = self.info
         return f"{self.__class__.__name__}(model={info.model_name}, provider={info.provider_name})"
-
-
-# ==================== 工具函数 ====================
-
-def build_messages(
-    system_prompt: str,
-    user_prompt: str,
-    history: Optional[List[Dict[str, str]]] = None
-) -> List[Dict[str, str]]:
-    """
-    构建消息列表
-    
-    Args:
-        system_prompt: 系统提示
-        user_prompt: 用户提示
-        history: 可选的历史消息
-        
-    Returns:
-        格式化的消息列表
-    """
-    messages = [{"role": "system", "content": system_prompt}]
-    
-    if history:
-        messages.extend(history)
-    
-    messages.append({"role": "user", "content": user_prompt})
-    
-    return messages
