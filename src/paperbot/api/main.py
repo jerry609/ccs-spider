@@ -12,9 +12,7 @@ from fastapi import FastAPI
 from paperbot.api.middleware import install_api_auth, install_cors, install_rate_limiting
 from .routes import (
     track,
-    analyze,
     gen_code,
-    review,
     chat,
     runs,
     jobs,
@@ -75,9 +73,7 @@ async def health_check():
 
 # Include routers
 app.include_router(track.router, prefix="/api", tags=["Scholar Tracking"])
-app.include_router(analyze.router, prefix="/api", tags=["Paper Analysis"])
 app.include_router(gen_code.router, prefix="/api", tags=["Paper2Code"])
-app.include_router(review.router, prefix="/api", tags=["Review"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(runs.router, prefix="/api", tags=["Runs"])
 app.include_router(jobs.router, prefix="/api", tags=["Jobs"])
