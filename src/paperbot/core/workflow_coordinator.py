@@ -73,7 +73,6 @@ class ScholarWorkflowCoordinator:
             config: 配置字典，包含：
                 - output_dir: 输出目录
                 - report_template: 报告模板名称
-                - use_documentation_agent: 是否使用文档Agent
                 - mode: 运行模式 (production/academic)
                 - enable_fail_fast: 是否启用 Fail-Fast
                 - fail_fast: Fail-Fast 配置
@@ -83,7 +82,6 @@ class ScholarWorkflowCoordinator:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
         self.report_template = self.config.get("report_template", "paper_report.md.j2")
-        self.use_documentation_agent = self.config.get("use_documentation_agent", False)
         self.mode = self.config.get("mode", "production")
         
         # P3: Fail-Fast 配置

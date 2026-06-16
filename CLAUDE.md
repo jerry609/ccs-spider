@@ -57,8 +57,6 @@ PYTHONPATH=src pytest -q \
   tests/integration/test_eventlog_sqlalchemy.py \
   tests/integration/test_crawler_contract_parsers.py \
   tests/integration/test_arxiv_connector_fixture.py \
-  tests/integration/test_reddit_connector_fixture.py \
-  tests/integration/test_x_importer_fixture.py \
   tests/e2e/test_api_track_fullstack_offline.py
 
 # Eval smoke tests (also in CI)

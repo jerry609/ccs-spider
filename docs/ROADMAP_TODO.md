@@ -371,9 +371,6 @@ PaperBot 目前包含 **5 套多智能体系统**，覆盖学者追踪、Paper2C
 | PaperTrackerAgent | 论文动态追踪 | `agents/scholar_tracking/paper_tracker_agent.py` |
 | DeepResearchAgent | 深度研究分析 | `agents/scholar_tracking/deep_research_agent.py` |
 | ConferenceAgent | 顶会论文抓取 | `agents/conference/agent.py` |
-| OpenReviewAgent | OpenReview 数据获取 | `agents/openreview/agent.py` |
-| HuggingFaceAgent | HuggingFace Hub 数据获取 | `agents/huggingface/agent.py` |
-| DocumentationAgent | 文档生成 | `agents/documentation/agent.py` |
 | VerificationAgent | 声明验证 | `agents/verification/agent.py` |
 
 ### OpenClaw 迁移评估
